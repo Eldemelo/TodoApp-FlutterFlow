@@ -144,6 +144,8 @@ class _TasksWidgetState extends State<TasksWidget> {
                                     .bodyLarge
                                     .override(
                                       fontFamily: 'Inter',
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.bold,
                                     ),
