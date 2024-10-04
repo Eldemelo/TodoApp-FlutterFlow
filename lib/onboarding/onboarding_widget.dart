@@ -8,6 +8,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/upload_data.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'onboarding_model.dart';
 export 'onboarding_model.dart';
 
@@ -355,6 +356,10 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                               validator: _model
                                   .phoneFieldTextControllerValidator
                                   .asValidator(context),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp('[0-9]'))
+                              ],
                             ),
                           ),
                           FFButtonWidget(
