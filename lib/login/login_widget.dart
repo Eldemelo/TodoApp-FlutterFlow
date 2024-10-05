@@ -1,4 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/api_requests/api_calls.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -762,42 +763,71 @@ class _LoginWidgetState extends State<LoginWidget>
                                   !_model.formKey1.currentState!.validate()) {
                                 return;
                               }
-                              GoRouter.of(context).prepareAuthEvent();
-                              if (_model.signupPasswordTextController.text !=
-                                  _model.signupConfirmPasswordTextController
-                                      .text) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Passwords don\'t match!',
+                              _model.apiResultum3 =
+                                  await SendWelcomeEmailCall.call(
+                                to: _model.signupEmailTextController.text,
+                              );
+
+                              if ((_model.apiResultum3?.succeeded ?? true)) {
+                                GoRouter.of(context).prepareAuthEvent();
+                                if (_model.signupPasswordTextController.text !=
+                                    _model.signupConfirmPasswordTextController
+                                        .text) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Passwords don\'t match!',
+                                      ),
                                     ),
+                                  );
+                                  return;
+                                }
+
+                                final user =
+                                    await authManager.createAccountWithEmail(
+                                  context,
+                                  _model.signupEmailTextController.text,
+                                  _model.signupPasswordTextController.text,
+                                );
+                                if (user == null) {
+                                  return;
+                                }
+
+                                await UsersRecord.collection
+                                    .doc(user.uid)
+                                    .update(createUsersRecordData(
+                                      email: valueOrDefault<String>(
+                                        _model.signupEmailTextController.text,
+                                        'example@email.com',
+                                      ),
+                                      createdTime: getCurrentTimestamp,
+                                    ));
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Please check your email!',
+                                      style: TextStyle(
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                      ),
+                                    ),
+                                    duration: const Duration(milliseconds: 4000),
+                                    backgroundColor:
+                                        FlutterFlowTheme.of(context).secondary,
                                   ),
                                 );
-                                return;
+
+                                context.goNamedAuth(
+                                    'onboarding', context.mounted);
+
+                                await Future.delayed(
+                                    const Duration(milliseconds: 40000));
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
                               }
 
-                              final user =
-                                  await authManager.createAccountWithEmail(
-                                context,
-                                _model.signupEmailTextController.text,
-                                _model.signupPasswordTextController.text,
-                              );
-                              if (user == null) {
-                                return;
-                              }
-
-                              await UsersRecord.collection
-                                  .doc(user.uid)
-                                  .update(createUsersRecordData(
-                                    email: valueOrDefault<String>(
-                                      _model.signupEmailTextController.text,
-                                      'example@email.com',
-                                    ),
-                                    createdTime: getCurrentTimestamp,
-                                  ));
-
-                              context.goNamedAuth(
-                                  'onboarding', context.mounted);
+                              safeSetState(() {});
                             },
                             text: 'Sign Up',
                             options: FFButtonOptions(

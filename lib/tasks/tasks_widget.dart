@@ -130,7 +130,7 @@ class _TasksWidgetState extends State<TasksWidget> {
                                 await authManager.signOut();
                                 GoRouter.of(context).clearRedirectLocation();
 
-                                context.pushNamedAuth('Login', context.mounted);
+                                context.goNamedAuth('Login', context.mounted);
                               },
                               text: 'Log Out',
                               options: FFButtonOptions(
